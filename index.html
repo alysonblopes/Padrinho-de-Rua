@@ -483,6 +483,10 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           Ruas / Setores
         </button>
+        <button class="nav-item" onclick="goPage('responsaveis')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+          Responsáveis
+        </button>
       </div>
     </div>
 
@@ -637,6 +641,38 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
         </div>
       </div>
 
+      <!-- ── RESPONSÁVEIS PAGE ── -->
+      <div class="page" id="page-responsaveis">
+        <div class="page-header">
+          <div class="page-title">Responsáveis</div>
+          <button class="btn btn-primary" onclick="openColabModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Responsável
+          </button>
+        </div>
+        <div class="toolbar">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchColab" placeholder="Buscar responsável..." oninput="renderColaboradores()">
+          </div>
+          <button class="btn btn-sm" onclick="loadColaboradores()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+        </div>
+        <div class="table-card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Foto</th><th>Nome</th><th>Matrícula</th><th>Turno</th><th>Status</th><th>Ações</th></tr>
+              </thead>
+              <tbody id="tbColab"></tbody>
+            </table>
+            <div id="emptyColab" class="empty" style="display:none"><p>Nenhum responsável cadastrado</p></div>
+            <div id="loadingColab" class="loading-row"><span class="spin spin-dark"></span> Carregando...</div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main -->
   </div><!-- /layout -->
 </div><!-- /appScreen -->
@@ -785,7 +821,9 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
       <input type="hidden" id="rEditId">
       <div id="mRuaErr" class="msg-err"></div>
       <div class="form-field"><label>Nome da Rua / Setor</label><input type="text" id="rNome" placeholder="Ex: Rua A — Setor Produção"></div>
-      <div class="form-field"><label>Responsável</label><input type="text" id="rResp" placeholder="Nome do colaborador responsável pela rua"></div>
+      <div class="form-field"><label>Responsável</label>
+        <select id="rRespId"><option value="">Selecione o responsável</option></select>
+      </div>
       <div class="form-field"><label>Líder Responsável</label><input type="text" id="rLider" placeholder="Nome do líder responsável pelo colaborador"></div>
       <div class="form-field"><label>Turno</label>
         <select id="rTurno"><option value="">Selecione</option><option>1º Turno</option><option>2º Turno</option><option>Comercial</option></select>
@@ -797,6 +835,45 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
     <div class="modal-foot">
       <button class="btn" onclick="closeModal('mRua')">Cancelar</button>
       <button class="btn btn-primary" onclick="saveRua()" id="savRuaBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL — RESPONSÁVEL (COLABORADOR) -->
+<div class="modal-bg" id="mColab">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="mColabTitle">Novo Responsável</h3>
+      <button class="icon-btn" onclick="closeModal('mColab')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cEditId">
+      <div id="mColabErr" class="msg-err"></div>
+      <div class="photo-wrap">
+        <div class="photo-circle" id="cPhotoPreview"></div>
+        <div>
+          <button class="btn btn-sm" onclick="document.getElementById('cPhotoInput').click()">Alterar foto</button>
+          <p style="font-size:11px;color:var(--text3);margin-top:4px">JPG ou PNG, máx. 2MB</p>
+          <input type="file" id="cPhotoInput" accept="image/*" style="display:none" onchange="previewColabPhoto(event)">
+        </div>
+      </div>
+      <div class="form-field"><label>Nome completo</label><input type="text" id="cNome" placeholder="Nome completo do colaborador"></div>
+      <div class="grid2">
+        <div class="form-field"><label>Matrícula / Registro</label><input type="text" id="cMatricula" placeholder="Ex: 003348"></div>
+        <div class="form-field"><label>Turno</label>
+          <select id="cTurno"><option value="">Selecione</option><option>1º Turno</option><option>2º Turno</option><option>Comercial</option></select>
+        </div>
+      </div>
+      <div class="form-field"><label>Status</label>
+        <select id="cAtivo"><option value="true">Ativo</option><option value="false">Inativo</option></select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('mColab')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveColaborador()" id="savColabBtn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Salvar
       </button>
@@ -840,6 +917,7 @@ let currentUser    = null;
 let currentProfile = null;
 let allOcorrencias = [];
 let allRuas        = [];
+let allColaboradores = [];
 let allUsers       = [];
 let pendingFiles   = []; // arquivos a fazer upload no save
 let currentPage    = 'ocorrencias';
@@ -912,6 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
       currentUser = session.user;
       await loadProfile();
       setupApp();
+      await loadColaboradores();
       await loadRuas();
       await loadOcorrencias();
     } else {
@@ -1002,6 +1081,7 @@ function goPage(page){
   });
   if(page==='usuarios') loadUsers();
   if(page==='ruas') loadRuas();
+  if(page==='responsaveis') loadColaboradores();
   if(page==='dashboard') renderDashboard();
   // Fecha sidebar no mobile ao navegar
   const sb=document.querySelector('.sidebar');
@@ -1102,10 +1182,14 @@ function renderRuaStatusCards(){
     const dataFmt=new Date(dataCard+'T12:00:00').toLocaleDateString('pt-BR');
     const ultimaFmt=ultima?new Date(ultima+'T12:00:00').toLocaleDateString('pt-BR'):'—';
 
+    const respNome=rua.colaboradores?.nome||rua.responsavel||'Sem responsável definido';
+    const respFoto=rua.colaboradores?.foto_url;
+    const avatarHtml=respFoto?`<img src="${respFoto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:iconAvatar;
+
     return `<div class="rua-status-card">
       <div class="rua-status-head">${esc(rua.nome)}</div>
-      <div class="rua-status-avatar">${iconAvatar}</div>
-      <div class="rua-status-name">${esc(rua.responsavel||'Sem responsável definido')}</div>
+      <div class="rua-status-avatar">${avatarHtml}</div>
+      <div class="rua-status-name">${esc(respNome)}</div>
       <div class="rua-status-date">${dataFmt}</div>
       <div class="rua-status-badge ${statusClass}">${statusLabel}</div>
       <div class="rua-status-footer">Última ocorrência:<br>${ultimaFmt}</div>
@@ -1117,20 +1201,20 @@ function renderRuaStatusCards(){
    RUAS
 ══════════════════════════════════════════════ */
 async function loadRuas(){
-  const {data,error}=await sb.from('ruas').select('*').eq('ativo',true).order('nome');
+  const {data,error}=await sb.from('ruas').select('*, colaboradores(nome,foto_url,turno)').eq('ativo',true).order('nome');
   if(!error) allRuas=data||[];
   // popula select no modal de ocorrência
   const sel=$('oRua');
   const cur=sel.value;
   sel.innerHTML='<option value="">Selecione a rua</option>';
-  allRuas.forEach(r=>{ sel.innerHTML+=`<option value="${r.id}" data-resp="${esc(r.responsavel||'')}" data-lider="${esc(r.lider_responsavel||'')}" data-turno="${esc(r.turno||'')}">${esc(r.nome)}</option>`; });
+  allRuas.forEach(r=>{ const respNome=r.colaboradores?.nome||r.responsavel||''; sel.innerHTML+=`<option value="${r.id}" data-resp="${esc(respNome)}" data-lider="${esc(r.lider_responsavel||'')}" data-turno="${esc(r.turno||'')}">${esc(r.nome)}</option>`; });
   if(cur) sel.value=cur;
   // tabela
   if(currentPage==='ruas') renderRuas();
 }
 
 async function loadRuasAll(){
-  const {data}=await sb.from('ruas').select('*').order('nome');
+  const {data}=await sb.from('ruas').select('*, colaboradores(nome,foto_url,turno)').order('nome');
   allRuas=data||[];
   renderRuas();
 }
@@ -1144,7 +1228,7 @@ function renderRuas(){
     <tr>
       <td class="mono">#${r.id}</td>
       <td><strong>${esc(r.nome)}</strong></td>
-      <td>${esc(r.responsavel||'—')}</td>
+      <td>${esc(r.colaboradores?.nome||r.responsavel||'—')}</td>
       <td>${esc(r.lider_responsavel||'—')}</td>
       <td>${r.turno?`<span class="badge b-usuario">${esc(r.turno)}</span>`:'—'}</td>
       <td>${r.ativo?'<span class="badge b-resolvido">Ativa</span>':'<span class="badge b-cancelado">Inativa</span>'}</td>
@@ -1156,11 +1240,18 @@ function renderRuas(){
   `).join('');
 }
 
+function populateRRespSelect(selectedId){
+  const sel=$('rRespId'); if(!sel) return;
+  sel.innerHTML='<option value="">Selecione o responsável</option>';
+  allColaboradores.filter(c=>c.ativo).forEach(c=>{ sel.innerHTML+=`<option value="${c.id}">${esc(c.nome)}</option>`; });
+  sel.value=selectedId||'';
+}
+
 function openRuaModal(r=null){
   $('rEditId').value=r?r.id:'';
   $('mRuaTitle').textContent=r?'Editar Rua / Setor':'Nova Rua / Setor';
   $('rNome').value=r?.nome||'';
-  $('rResp').value=r?.responsavel||'';
+  populateRRespSelect(r?.responsavel_id||'');
   $('rLider').value=r?.lider_responsavel||'';
   $('rTurno').value=r?.turno||'';
   $('rAtivo').value=r?String(r.ativo):'true';
@@ -1172,7 +1263,7 @@ function editRua(id){ const r=allRuas.find(x=>x.id===id); if(r) openRuaModal(r);
 
 async function saveRua(){
   const id=$('rEditId').value;
-  const payload={nome:v('rNome').trim(),responsavel:v('rResp').trim()||null,lider_responsavel:v('rLider').trim()||null,turno:v('rTurno')||null,ativo:$('rAtivo').value==='true'};
+  const payload={nome:v('rNome').trim(),responsavel_id:v('rRespId')||null,lider_responsavel:v('rLider').trim()||null,turno:v('rTurno')||null,ativo:$('rAtivo').value==='true'};
   if(!payload.nome){ showEl($('mRuaErr'),'Nome é obrigatório.'); return; }
   const btn=$('savRuaBtn'); setBtnLoading(btn,'Salvando...');
   const {error}=id?await sb.from('ruas').update(payload).eq('id',id):await sb.from('ruas').insert(payload);
@@ -1187,6 +1278,106 @@ async function deleteRua(id){
   if(!confirm('Excluir esta rua?')) return;
   await sb.from('ruas').delete().eq('id',id);
   toast('Rua excluída.');
+  await loadRuasAll();
+}
+
+/* ══════════════════════════════════════════════
+   RESPONSÁVEIS (COLABORADORES)
+══════════════════════════════════════════════ */
+async function loadColaboradores(){
+  $('loadingColab') && ($('loadingColab').style.display='flex');
+  const {data,error}=await sb.from('colaboradores').select('*').order('nome');
+  $('loadingColab') && ($('loadingColab').style.display='none');
+  if(!error) allColaboradores=data||[];
+  populateRRespSelect($('rRespId')?.value);
+  if(currentPage==='responsaveis') renderColaboradores();
+}
+
+function renderColaboradores(){
+  const tb=$('tbColab'); if(!tb) return;
+  const q=(v('searchColab')||'').toLowerCase();
+  const filtered=allColaboradores.filter(c=>!q||((c.nome||'')+(c.matricula||'')).toLowerCase().includes(q));
+  $('emptyColab').style.display=filtered.length?'none':'block';
+  tb.innerHTML=filtered.map(c=>`
+    <tr>
+      <td><div class="t-avatar">${c.foto_url?`<img src="${c.foto_url}" alt="">`:esc((c.nome||'R').slice(0,2).toUpperCase())}</div></td>
+      <td><strong>${esc(c.nome)}</strong></td>
+      <td class="mono">${esc(c.matricula||'—')}</td>
+      <td>${c.turno?`<span class="badge b-usuario">${esc(c.turno)}</span>`:'—'}</td>
+      <td>${c.ativo?'<span class="badge b-resolvido">Ativo</span>':'<span class="badge b-cancelado">Inativo</span>'}</td>
+      <td><div class="actions">
+        <button class="icon-btn" title="Editar" onclick="editColaborador(${c.id})">${iconEdit}</button>
+        <button class="icon-btn del" title="Excluir" onclick="deleteColaborador(${c.id})">${iconTrash}</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+let newColabPhotoFile=null;
+
+function openColabModal(r=null){
+  $('cEditId').value=r?r.id:'';
+  $('mColabTitle').textContent=r?'Editar Responsável':'Novo Responsável';
+  $('cNome').value=r?.nome||'';
+  $('cMatricula').value=r?.matricula||'';
+  $('cTurno').value=r?.turno||'';
+  $('cAtivo').value=r?String(r.ativo):'true';
+  $('mColabErr').style.display='none';
+  newColabPhotoFile=null;
+  const ph=$('cPhotoPreview');
+  if(r?.foto_url){ ph.innerHTML=`<img src="${r.foto_url}" alt="" style="width:100%;height:100%;object-fit:cover">`; }
+  else { ph.textContent=(r?.nome||'R').slice(0,2).toUpperCase(); }
+  openModal('mColab');
+}
+
+function editColaborador(id){ const c=allColaboradores.find(x=>x.id===id); if(c) openColabModal(c); }
+
+function previewColabPhoto(e){
+  const f=e.target.files[0]; if(!f) return;
+  newColabPhotoFile=f;
+  const r=new FileReader();
+  r.onload=ev=>{ $('cPhotoPreview').innerHTML=`<img src="${ev.target.result}" alt="" style="width:100%;height:100%;object-fit:cover">`; };
+  r.readAsDataURL(f);
+}
+
+async function saveColaborador(){
+  const id=$('cEditId').value;
+  const err=$('mColabErr'), btn=$('savColabBtn');
+  err.style.display='none';
+  const nome=v('cNome').trim();
+  if(!nome){ showEl(err,'Nome completo é obrigatório.'); return; }
+  setBtnLoading(btn,'Salvando...');
+  const payload={
+    nome,
+    matricula:v('cMatricula').trim()||null,
+    turno:v('cTurno')||null,
+    ativo:$('cAtivo').value==='true'
+  };
+  const {data,error}=id
+    ? await sb.from('colaboradores').update(payload).eq('id',id).select().single()
+    : await sb.from('colaboradores').insert(payload).select().single();
+  if(error){ resetBtn(btn,'Salvar'); showEl(err,error.message); return; }
+  const targetId=data.id;
+  if(newColabPhotoFile){
+    const path=`colaboradores/${targetId}_${Date.now()}.${newColabPhotoFile.name.split('.').pop()}`;
+    const {error:upErr}=await sb.storage.from('fotos').upload(path,newColabPhotoFile,{upsert:true});
+    if(!upErr){
+      const {data:{publicUrl}}=sb.storage.from('fotos').getPublicUrl(path);
+      await sb.from('colaboradores').update({foto_url:publicUrl}).eq('id',targetId);
+    }
+  }
+  resetBtn(btn,'Salvar');
+  toast(id?'Responsável atualizado!':'Responsável cadastrado!','ok');
+  closeModal('mColab');
+  await loadColaboradores();
+  await loadRuasAll();
+}
+
+async function deleteColaborador(id){
+  if(!confirm('Excluir este responsável? Ruas vinculadas a ele ficarão sem responsável definido.')) return;
+  await sb.from('colaboradores').delete().eq('id',id);
+  toast('Responsável excluído.');
+  await loadColaboradores();
   await loadRuasAll();
 }
 
