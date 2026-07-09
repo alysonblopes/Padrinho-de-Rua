@@ -668,7 +668,7 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Foto</th><th>Nome</th><th>Matrícula</th><th>Turno</th><th>Status</th><th>Ações</th></tr>
+                <tr><th>Foto</th><th>Nome</th><th>Matrícula</th><th>Cargo</th><th>Líder</th><th>Setor</th><th>Turno</th><th>Status</th><th>Ações</th></tr>
               </thead>
               <tbody id="tbColab"></tbody>
             </table>
@@ -880,6 +880,27 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
         <div class="form-field"><label>Turno</label>
           <select id="cTurno"><option value="">Selecione</option><option>1º Turno</option><option>2º Turno</option><option>Comercial</option></select>
         </div>
+      </div>
+      <div class="grid2">
+        <div class="form-field"><label>Cargo</label>
+          <select id="cCargo" onchange="updateColabCargoFields()">
+            <option value="Colaborador">Colaborador</option>
+            <option value="Líder">Líder</option>
+            <option value="Coordenador/Supervisor">Coordenador/Supervisor</option>
+          </select>
+        </div>
+        <div class="form-field" id="cLiderWrap"><label>Líder</label>
+          <select id="cLiderId"><option value="">Selecione o líder</option></select>
+        </div>
+      </div>
+      <div class="form-field" id="cSetorWrap"><label>Setor que cuida</label>
+        <select id="cSetor">
+          <option value="">Selecione</option>
+          <option>Pré-Expedição</option>
+          <option>Matéria-Prima</option>
+          <option>Logística</option>
+          <option>Imprensa</option>
+        </select>
       </div>
       <div class="form-field"><label>Status</label>
         <select id="cAtivo"><option value="true">Ativo</option><option value="false">Inativo</option></select>
@@ -1335,22 +1356,43 @@ function renderColaboradores(){
   const q=(v('searchColab')||'').toLowerCase();
   const filtered=allColaboradores.filter(c=>!q||((c.nome||'')+(c.matricula||'')).toLowerCase().includes(q));
   $('emptyColab').style.display=filtered.length?'none':'block';
-  tb.innerHTML=filtered.map(c=>`
-    <tr>
+  const cargoBadgeClass={'Colaborador':'b-usuario','Líder':'b-lider','Coordenador/Supervisor':'b-admin'};
+  tb.innerHTML=filtered.map(c=>{
+    const liderNome=c.lider_id?(allColaboradores.find(x=>x.id===c.lider_id)?.nome||'—'):'—';
+    return `<tr>
       <td><div class="t-avatar">${c.foto_url?`<img src="${c.foto_url}" alt="">`:esc((c.nome||'R').slice(0,2).toUpperCase())}</div></td>
       <td><strong>${esc(c.nome)}</strong></td>
       <td class="mono">${esc(c.matricula||'—')}</td>
+      <td><span class="badge ${cargoBadgeClass[c.cargo]||'b-usuario'}">${esc(c.cargo||'Colaborador')}</span></td>
+      <td>${esc(liderNome)}</td>
+      <td>${c.setor?`<span class="badge b-usuario">${esc(c.setor)}</span>`:'—'}</td>
       <td>${c.turno?`<span class="badge b-usuario">${esc(c.turno)}</span>`:'—'}</td>
       <td>${c.ativo?'<span class="badge b-resolvido">Ativo</span>':'<span class="badge b-cancelado">Inativo</span>'}</td>
       <td><div class="actions">
         <button class="icon-btn" title="Editar" onclick="editColaborador(${c.id})">${iconEdit}</button>
         <button class="icon-btn del" title="Excluir" onclick="deleteColaborador(${c.id})">${iconTrash}</button>
       </div></td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 let newColabPhotoFile=null;
+
+function updateColabCargoFields(){
+  const cargo=v('cCargo');
+  const isLiderOuCoord=(cargo==='Líder'||cargo==='Coordenador/Supervisor');
+  $('cLiderWrap').style.display=isLiderOuCoord?'none':'';
+  $('cSetorWrap').style.display=isLiderOuCoord?'':'none';
+}
+
+function populateCLiderSelect(selectedId,excludeId){
+  const sel=$('cLiderId'); if(!sel) return;
+  sel.innerHTML='<option value="">Selecione o líder</option>';
+  allColaboradores.filter(c=>c.ativo&&(c.cargo==='Líder'||c.cargo==='Coordenador/Supervisor')&&c.id!==excludeId).forEach(c=>{
+    sel.innerHTML+=`<option value="${c.id}">${esc(c.nome)}${c.setor?` (${esc(c.setor)})`:''}</option>`;
+  });
+  sel.value=selectedId||'';
+}
 
 function openColabModal(r=null){
   $('cEditId').value=r?r.id:'';
@@ -1358,6 +1400,10 @@ function openColabModal(r=null){
   $('cNome').value=r?.nome||'';
   $('cMatricula').value=r?.matricula||'';
   $('cTurno').value=r?.turno||'';
+  $('cCargo').value=r?.cargo||'Colaborador';
+  populateCLiderSelect(r?.lider_id||'', r?.id||null);
+  $('cSetor').value=r?.setor||'';
+  updateColabCargoFields();
   $('cAtivo').value=r?String(r.ativo):'true';
   $('mColabErr').style.display='none';
   newColabPhotoFile=null;
@@ -1383,11 +1429,16 @@ async function saveColaborador(){
   err.style.display='none';
   const nome=v('cNome').trim();
   if(!nome){ showEl(err,'Nome completo é obrigatório.'); return; }
+  const cargo=v('cCargo')||'Colaborador';
+  const isLiderOuCoord=(cargo==='Líder'||cargo==='Coordenador/Supervisor');
   setBtnLoading(btn,'Salvando...');
   const payload={
     nome,
     matricula:v('cMatricula').trim()||null,
     turno:v('cTurno')||null,
+    cargo,
+    lider_id:isLiderOuCoord?null:(v('cLiderId')||null),
+    setor:isLiderOuCoord?(v('cSetor')||null):null,
     ativo:$('cAtivo').value==='true'
   };
   const {data,error}=id
