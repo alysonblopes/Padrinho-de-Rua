@@ -132,6 +132,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 table{width:100%;border-collapse:collapse;min-width:960px}
 thead tr{background:var(--surface2)}
 th{text-align:left;padding:10px 14px;font-family:var(--font-cond);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text2);border-bottom:1.5px solid var(--border);white-space:nowrap}
+th.sortable-th{cursor:pointer;user-select:none}
+th.sortable-th:hover{color:var(--wp-blue)}
+th.sortable-th .sort-arrow{font-size:9px;margin-left:4px;letter-spacing:0}
 td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:#FAFBFF}
@@ -577,10 +580,10 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <div class="table-wrap">
             <table>
               <thead>
-                <tr>
-                  <th>ID</th><th>Data</th><th>Rua / Setor</th><th>Responsável</th><th>Líder</th>
-                  <th>Ocorrência</th><th>Criticidade</th><th>Status</th>
-                  <th>Resp. Verif.</th><th>Reg. Verif.</th><th>Anexos</th><th>Ações</th>
+                <tr id="thead-ocorrencias">
+                  <th class="sortable-th" data-label="ID" onclick="sortTable('ocorrencias','id')">ID</th><th class="sortable-th" data-label="Data" onclick="sortTable('ocorrencias','data')">Data</th><th class="sortable-th" data-label="Rua / Setor" onclick="sortTable('ocorrencias','rua')">Rua / Setor</th><th class="sortable-th" data-label="Responsável" onclick="sortTable('ocorrencias','responsavel')">Responsável</th><th class="sortable-th" data-label="Líder" onclick="sortTable('ocorrencias','lider')">Líder</th>
+                  <th class="sortable-th" data-label="Ocorrência" onclick="sortTable('ocorrencias','ocorrencia')">Ocorrência</th><th class="sortable-th" data-label="Criticidade" onclick="sortTable('ocorrencias','criticidade')">Criticidade</th><th class="sortable-th" data-label="Status" onclick="sortTable('ocorrencias','status')">Status</th>
+                  <th class="sortable-th" data-label="Resp. Verif." onclick="sortTable('ocorrencias','respverif')">Resp. Verif.</th><th class="sortable-th" data-label="Reg. Verif." onclick="sortTable('ocorrencias','regverif')">Reg. Verif.</th><th>Anexos</th><th>Ações</th>
                 </tr>
               </thead>
               <tbody id="tbOcorrencias"></tbody>
@@ -613,7 +616,7 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Foto</th><th>Nome</th><th>E-mail</th><th>Matrícula</th><th>Turno</th><th>Responsável</th><th>Cargo</th><th>Ações</th></tr>
+                <tr id="thead-usuarios"><th>Foto</th><th class="sortable-th" data-label="Nome" onclick="sortTable('usuarios','nome')">Nome</th><th class="sortable-th" data-label="E-mail" onclick="sortTable('usuarios','email')">E-mail</th><th class="sortable-th" data-label="Matrícula" onclick="sortTable('usuarios','matricula')">Matrícula</th><th class="sortable-th" data-label="Turno" onclick="sortTable('usuarios','turno')">Turno</th><th class="sortable-th" data-label="Responsável" onclick="sortTable('usuarios','responsavel')">Responsável</th><th class="sortable-th" data-label="Cargo" onclick="sortTable('usuarios','cargo')">Cargo</th><th>Ações</th></tr>
               </thead>
               <tbody id="tbUsers"></tbody>
             </table>
@@ -636,7 +639,7 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>ID</th><th>Nome da Rua / Setor</th><th>Setor</th><th>Responsável</th><th>Líder Responsável</th><th>Turno</th><th>Ativo</th><th>Ações</th></tr>
+                <tr id="thead-ruas"><th class="sortable-th" data-label="ID" onclick="sortTable('ruas','id')">ID</th><th class="sortable-th" data-label="Nome da Rua / Setor" onclick="sortTable('ruas','nome')">Nome da Rua / Setor</th><th class="sortable-th" data-label="Setor" onclick="sortTable('ruas','setor')">Setor</th><th class="sortable-th" data-label="Responsável" onclick="sortTable('ruas','responsavel')">Responsável</th><th class="sortable-th" data-label="Líder Responsável" onclick="sortTable('ruas','lider')">Líder Responsável</th><th class="sortable-th" data-label="Turno" onclick="sortTable('ruas','turno')">Turno</th><th class="sortable-th" data-label="Ativo" onclick="sortTable('ruas','ativo')">Ativo</th><th>Ações</th></tr>
               </thead>
               <tbody id="tbRuas"></tbody>
             </table>
@@ -668,7 +671,7 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Foto</th><th>Nome</th><th>Matrícula</th><th>Cargo</th><th>Líder</th><th>Setor</th><th>Turno</th><th>Status</th><th>Ações</th></tr>
+                <tr id="thead-colaboradores"><th>Foto</th><th class="sortable-th" data-label="Nome" onclick="sortTable('colaboradores','nome')">Nome</th><th class="sortable-th" data-label="Matrícula" onclick="sortTable('colaboradores','matricula')">Matrícula</th><th class="sortable-th" data-label="Cargo" onclick="sortTable('colaboradores','cargo')">Cargo</th><th class="sortable-th" data-label="Líder" onclick="sortTable('colaboradores','lider')">Líder</th><th class="sortable-th" data-label="Setor" onclick="sortTable('colaboradores','setor')">Setor</th><th class="sortable-th" data-label="Turno" onclick="sortTable('colaboradores','turno')">Turno</th><th class="sortable-th" data-label="Status" onclick="sortTable('colaboradores','status')">Status</th><th>Ações</th></tr>
               </thead>
               <tbody id="tbColab"></tbody>
             </table>
@@ -965,6 +968,80 @@ let allOcorrencias = [];
 let allRuas        = [];
 let allColaboradores = [];
 let allUsers       = [];
+
+/* ══════════════════════════════════════════════
+   ORDENAÇÃO DE TABELAS (clique no cabeçalho)
+══════════════════════════════════════════════ */
+const sortState={ocorrencias:{key:null,dir:1},usuarios:{key:null,dir:1},ruas:{key:null,dir:1},colaboradores:{key:null,dir:1}};
+
+const sortExtractors={
+  ocorrencias:{
+    id:r=>r.id,
+    data:r=>r.data_ocorrencia||'',
+    rua:r=>(r.ruas?.nome||r.rua_ocorrencia||''),
+    responsavel:r=>r.responsavel||'',
+    lider:r=>r.lider_responsavel||'',
+    ocorrencia:r=>r.ocorrencia||'',
+    criticidade:r=>r.criticidade||'',
+    status:r=>r.status||'',
+    respverif:r=>r.responsavel_verif||'',
+    regverif:r=>r.registro_verif||''
+  },
+  usuarios:{
+    nome:u=>u.nome||'',
+    email:u=>u.email||'',
+    matricula:u=>u.matricula||'',
+    turno:u=>u.turno||'',
+    responsavel:u=>u.responsavel||'',
+    cargo:u=>u.role||''
+  },
+  ruas:{
+    id:r=>r.id,
+    nome:r=>r.nome||'',
+    setor:r=>r.setor||'',
+    responsavel:r=>r.colaboradores?.nome||r.responsavel||'',
+    lider:r=>r.lider_responsavel||'',
+    turno:r=>r.turno||'',
+    ativo:r=>r.ativo?1:0
+  },
+  colaboradores:{
+    nome:c=>c.nome||'',
+    matricula:c=>c.matricula||'',
+    cargo:c=>c.cargo||'',
+    lider:c=>(c.lider_id?(allColaboradores.find(x=>x.id===c.lider_id)?.nome||''):''),
+    setor:c=>c.setor||'',
+    turno:c=>c.turno||'',
+    status:c=>c.ativo?1:0
+  }
+};
+
+function sortTable(tableKey,field){
+  const state=sortState[tableKey];
+  if(state.key===field) state.dir*=-1; else { state.key=field; state.dir=1; }
+  const arrMap={ocorrencias:allOcorrencias,usuarios:allUsers,ruas:allRuas,colaboradores:allColaboradores};
+  const arr=arrMap[tableKey];
+  const extractor=sortExtractors[tableKey][field];
+  arr.sort((a,b)=>{
+    const va=extractor(a), vb=extractor(b);
+    if(typeof va==='number' && typeof vb==='number') return (va-vb)*state.dir;
+    return String(va).toLowerCase().localeCompare(String(vb).toLowerCase(),'pt-BR')*state.dir;
+  });
+  const renderMap={ocorrencias:renderOcorrencias,usuarios:renderUsers,ruas:renderRuas,colaboradores:renderColaboradores};
+  renderMap[tableKey]();
+  updateSortIndicators(tableKey);
+}
+
+function updateSortIndicators(tableKey){
+  const row=$('thead-'+tableKey); if(!row) return;
+  const state=sortState[tableKey];
+  row.querySelectorAll('th.sortable-th').forEach(th=>{
+    const field=th.getAttribute('onclick').match(/'([^']+)'\s*\)/)[1];
+    const label=th.dataset.label;
+    if(field===state.key){ th.innerHTML=`${esc(label)}<span class="sort-arrow">${state.dir===1?'▲':'▼'}</span>`; }
+    else { th.textContent=label; }
+  });
+}
+
 let pendingFiles   = []; // arquivos a fazer upload no save
 let currentPage    = 'ocorrencias';
 
