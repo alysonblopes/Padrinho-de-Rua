@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -703,50 +702,61 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <select id="oCrit"><option value="">Selecione</option><option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option></select>
         </div>
       </div>
-      <div class="form-field"><label>Rua / Setor</label>
-        <select id="oRua" onchange="autoFillResponsavel()"><option value="">Selecione a rua</option></select>
+      <div class="form-field"><label>Setor</label>
+        <select id="oSetor" onchange="onSetorChangeOcorrencia()">
+          <option value="">Selecione o setor</option>
+          <option>Pré-Expedição</option>
+          <option>Matéria-Prima</option>
+          <option>Expedição</option>
+          <option>Movimentação</option>
+        </select>
       </div>
-      <div class="grid2">
-        <div class="form-field"><label>Responsável</label><input type="text" id="oResp" placeholder="Selecione uma rua para preencher automaticamente"></div>
-        <div class="form-field"><label>Líder Responsável</label><input type="text" id="oLider" placeholder="Nome do líder"></div>
-      </div>
-      <div class="form-field"><label>Descrição da Ocorrência</label><textarea id="oDescr" placeholder="Descreva detalhadamente..."></textarea></div>
-      <div id="oStatusField" class="form-field" style="display:none"><label>Status</label>
-        <select id="oStatus"><option>Aberto</option><option>Em andamento</option><option>Resolvido</option><option>Cancelado</option><option>Finalizada</option></select>
-      </div>
-      <div class="grid2">
-        <div class="form-field"><label>Responsável pela Verificação</label><input type="text" id="oRespVerif" placeholder="Nome"></div>
-        <div class="form-field"><label>Registro de Verificação</label><input type="text" id="oRegVerif" placeholder="Ex: REG-2024-001"></div>
-      </div>
-      <!-- VERIFICAÇÃO DE CAMPO -->
-      <div id="oVerifSection" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:4px;background:var(--surface2)">
-        <div style="font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:12px">Verificação de Campo</div>
-        <div class="form-field" style="margin-bottom:12px">
-          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500">
-            <input type="checkbox" id="oRuaChecada" style="width:16px;height:16px;accent-color:var(--wp-blue);cursor:pointer" onchange="handleRuaChecada()">
-            Rua verificada / checada no local
-          </label>
+      <div id="oGatedFields" style="opacity:.5;pointer-events:none">
+        <div class="form-field"><label>Rua / Setor</label>
+          <select id="oRua" onchange="autoFillResponsavel()"><option value="">Selecione o setor primeiro</option></select>
         </div>
-        <div class="form-field" id="oAcaoTomadaField">
-          <label>Ação Tomada <span style="font-size:11px;color:var(--text3);font-weight:400">(apenas líderes e admins)</span></label>
-          <textarea id="oAcaoTomada" placeholder="Descreva a ação tomada para resolução..." style="min-height:80px" oninput="handleRuaChecada()"></textarea>
+        <div class="grid2">
+          <div class="form-field"><label>Responsável</label><input type="text" id="oResp" placeholder="Selecione uma rua para preencher automaticamente"></div>
+          <div class="form-field"><label>Líder Responsável</label><input type="text" id="oLider" placeholder="Nome do líder"></div>
         </div>
-        <div id="oFinalizadaMsg" style="display:none;margin-top:8px;padding:8px 12px;background:var(--green-lt);border-radius:var(--radius);font-size:12px;color:var(--green);font-weight:600">
-          ✓ Ocorrência será marcada como Finalizada
+        <div class="form-field"><label>Descrição da Ocorrência</label><textarea id="oDescr" placeholder="Descreva detalhadamente..."></textarea></div>
+        <div id="oStatusField" class="form-field" style="display:none"><label>Status</label>
+          <select id="oStatus"><option>Aberto</option><option>Em andamento</option><option>Resolvido</option><option>Cancelado</option><option>Finalizada</option></select>
         </div>
-      </div>
+        <div class="grid2">
+          <div class="form-field"><label>Responsável pela Verificação</label><input type="text" id="oRespVerif" placeholder="Nome"></div>
+          <div class="form-field"><label>Registro de Verificação</label><input type="text" id="oRegVerif" placeholder="Ex: REG-2024-001"></div>
+        </div>
+        <!-- VERIFICAÇÃO DE CAMPO -->
+        <div id="oVerifSection" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:4px;background:var(--surface2)">
+          <div style="font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:12px">Verificação de Campo</div>
+          <div class="form-field" style="margin-bottom:12px">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500">
+              <input type="checkbox" id="oRuaChecada" style="width:16px;height:16px;accent-color:var(--wp-blue);cursor:pointer" onchange="handleRuaChecada()">
+              Rua verificada / checada no local
+            </label>
+          </div>
+          <div class="form-field" id="oAcaoTomadaField">
+            <label>Ação Tomada <span style="font-size:11px;color:var(--text3);font-weight:400">(apenas líderes e admins)</span></label>
+            <textarea id="oAcaoTomada" placeholder="Descreva a ação tomada para resolução..." style="min-height:80px" oninput="handleRuaChecada()"></textarea>
+          </div>
+          <div id="oFinalizadaMsg" style="display:none;margin-top:8px;padding:8px 12px;background:var(--green-lt);border-radius:var(--radius);font-size:12px;color:var(--green);font-weight:600">
+            ✓ Ocorrência será marcada como Finalizada
+          </div>
+        </div>
 
-      <!-- ANEXOS -->
-      <div class="form-field">
-        <label>Anexos</label>
-        <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <p>Clique ou arraste arquivos aqui</p>
-          <p style="font-size:11px;color:var(--text3);margin-top:2px">PDF, imagens, documentos — máx. 10MB cada</p>
+        <!-- ANEXOS -->
+        <div class="form-field">
+          <label>Anexos</label>
+          <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p>Clique ou arraste arquivos aqui</p>
+            <p style="font-size:11px;color:var(--text3);margin-top:2px">PDF, imagens, documentos — máx. 10MB cada</p>
+          </div>
+          <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
+          <div class="file-list" id="newFileList"></div>
+          <div class="file-list" id="existingFileList"></div>
         </div>
-        <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
-        <div class="file-list" id="newFileList"></div>
-        <div class="file-list" id="existingFileList"></div>
       </div>
     </div>
     <div class="modal-foot">
@@ -1260,12 +1270,9 @@ function renderRuaStatusCards(){
 async function loadRuas(){
   const {data,error}=await sb.from('ruas').select('*, colaboradores(nome,foto_url,turno)').eq('ativo',true).order('nome');
   if(!error) allRuas=data||[];
-  // popula select no modal de ocorrência
-  const sel=$('oRua');
-  const cur=sel.value;
-  sel.innerHTML='<option value="">Selecione a rua</option>';
-  allRuas.forEach(r=>{ const respNome=r.colaboradores?.nome||r.responsavel||''; const label=r.setor?`${r.nome} — ${r.setor}`:r.nome; sel.innerHTML+=`<option value="${r.id}" data-resp="${esc(respNome)}" data-lider="${esc(r.lider_responsavel||'')}" data-turno="${esc(r.turno||'')}">${esc(label)}</option>`; });
-  if(cur) sel.value=cur;
+  // Reaplica o filtro de rua por setor no modal de ocorrência, se estiver aberto
+  const setorAtual=v('oSetor');
+  if(setorAtual) populateOcorrenciaRuaOptions(setorAtual, $('oRua')?.value);
   // tabela
   if(currentPage==='ruas') renderRuas();
 }
@@ -1481,6 +1488,44 @@ async function deleteColaborador(id){
 }
 
 /* ══════════════════════════════════════════════
+/* ══════════════════════════════════════════════
+   SETOR → RUA (gate de preenchimento)
+══════════════════════════════════════════════ */
+function populateOcorrenciaRuaOptions(setor, selectedId){
+  const sel=$('oRua');
+  if(!setor){
+    sel.innerHTML='<option value="">Selecione o setor primeiro</option>';
+    return;
+  }
+  sel.innerHTML='<option value="">Selecione a rua</option>';
+  allRuas.filter(r=>r.setor===setor).forEach(r=>{
+    const respNome=r.colaboradores?.nome||r.responsavel||'';
+    sel.innerHTML+=`<option value="${r.id}" data-resp="${esc(respNome)}" data-lider="${esc(r.lider_responsavel||'')}" data-turno="${esc(r.turno||'')}">${esc(r.nome)}</option>`;
+  });
+  if(selectedId) sel.value=selectedId;
+}
+
+function setOcorrenciaGate(enabled){
+  const wrap=$('oGatedFields');
+  wrap.style.opacity=enabled?'1':'0.5';
+  wrap.style.pointerEvents=enabled?'':'none';
+  wrap.querySelectorAll('input,select,textarea').forEach(el=>{ el.disabled=!enabled; });
+  if(enabled){
+    // Reaplica a regra de cargo para os campos de verificação
+    const canStat=currentProfile?.role==='lider'||currentProfile?.role==='admin';
+    $('oAcaoTomada').disabled=!canStat;
+    $('oRuaChecada').disabled=!canStat;
+  }
+}
+
+function onSetorChangeOcorrencia(){
+  const setor=v('oSetor');
+  populateOcorrenciaRuaOptions(setor,'');
+  setOcorrenciaGate(!!setor);
+  autoFillResponsavel();
+}
+
+/* ══════════════════════════════════════════════
    AUTO-FILL RESPONSÁVEL
 ══════════════════════════════════════════════ */
 function autoFillResponsavel(){
@@ -1595,7 +1640,11 @@ function openOcorrenciaModal(r=null){
   $('oEditId').value=r?r.id:'';
   $('mOcorrenciaTitle').textContent=r?'Editar Ocorrência':'Nova Ocorrência';
   $('oData').value=r?.data_ocorrencia||'';
-  $('oRua').value=r?.rua_id||'';
+  // Setor / Rua — só libera a rua e os campos seguintes depois do setor escolhido
+  const setorAtual=r?.ruas?.setor||'';
+  $('oSetor').value=setorAtual;
+  populateOcorrenciaRuaOptions(setorAtual, r?.rua_id||'');
+  setOcorrenciaGate(!!setorAtual);
   // Reset responsavel field state
   const respField=$('oResp');
   respField.readOnly=false; respField.style.background=''; respField.style.color=''; respField.title='';
@@ -1643,6 +1692,7 @@ function openOcorrenciaModal(r=null){
   $('oAcaoTomada').placeholder=canStat?'Descreva a ação tomada para resolução...':'Apenas líderes e admins podem preencher';
   $('oRuaChecada').disabled=!canStat;
   $('oRuaChecada').style.cursor=canStat?'pointer':'not-allowed';
+  if(!setorAtual){ $('oAcaoTomada').disabled=true; $('oRuaChecada').disabled=true; }
   handleRuaChecada();
   if(r?.id) loadExistingAnexos(r.id);
   openModal('mOcorrencia');
