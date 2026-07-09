@@ -96,8 +96,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 /* ── RUA STATUS DIÁRIO ── */
 .rua-setor-group{margin-bottom:24px}
 .rua-setor-group:last-child{margin-bottom:0}
-.rua-setor-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--wp-blue);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--border)}
-.rua-status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.rua-setor-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px;text-decoration:underline;text-underline-offset:3px}
+.rua-setor-box{border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;overflow-x:auto}
+.rua-status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px}
 .rua-status-card{border:2px solid var(--wp-blue);border-radius:var(--radius-lg);overflow:hidden;background:#fff;display:flex;flex-direction:column}
 .rua-status-head{background:var(--wp-blue);color:#fff;text-align:center;padding:9px 8px;font-family:var(--font-cond);font-weight:700;font-size:15px;letter-spacing:.3px}
 .rua-status-avatar{width:60px;height:60px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;margin:14px auto 8px;color:#B0B6C2}
@@ -1225,7 +1226,7 @@ function renderRuaStatusCards(){
     const cardsHtml=groups[setor].map(rua=>buildRuaCardHtml(rua,todayStr,naoFinalizados)).join('');
     return `<div class="rua-setor-group">
       <div class="rua-setor-title">${esc(setor)}</div>
-      <div class="rua-status-grid">${cardsHtml}</div>
+      <div class="rua-setor-box"><div class="rua-status-grid">${cardsHtml}</div></div>
     </div>`;
   }).join('');
 }
