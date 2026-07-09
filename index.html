@@ -832,8 +832,8 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <option value="">Selecione</option>
           <option>Pré-Expedição</option>
           <option>Matéria-Prima</option>
-          <option>Logística</option>
-          <option>Imprensa</option>
+          <option>Expedição</option>
+          <option>Movimentação</option>
         </select>
       </div>
       <div class="form-field"><label>Responsável</label>
@@ -899,8 +899,8 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <option value="">Selecione</option>
           <option>Pré-Expedição</option>
           <option>Matéria-Prima</option>
-          <option>Logística</option>
-          <option>Imprensa</option>
+          <option>Expedição</option>
+          <option>Movimentação</option>
         </select>
       </div>
       <div class="form-field"><label>Status</label>
@@ -1224,7 +1224,7 @@ function buildRuaCardHtml(rua, todayStr, naoFinalizados){
   </div>`;
 }
 
-const SETOR_ORDER=['Pré-Expedição','Matéria-Prima','Logística','Imprensa'];
+const SETOR_ORDER=['Pré-Expedição','Matéria-Prima','Expedição','Movimentação'];
 
 function renderRuaStatusCards(){
   const el=$('dsRuaStatusGrid'); if(!el) return;
