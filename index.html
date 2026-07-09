@@ -97,6 +97,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 .rua-status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
 .rua-status-card{border:2px solid var(--wp-blue);border-radius:var(--radius-lg);overflow:hidden;background:#fff;display:flex;flex-direction:column}
 .rua-status-head{background:var(--wp-blue);color:#fff;text-align:center;padding:9px 8px;font-family:var(--font-cond);font-weight:700;font-size:15px;letter-spacing:.3px}
+.rua-status-setor{font-family:var(--font-base,inherit);font-weight:500;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;opacity:.8;margin-top:2px}
 .rua-status-avatar{width:60px;height:60px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;margin:14px auto 8px;color:#B0B6C2}
 .rua-status-name{text-align:center;font-size:11px;color:var(--text3);padding:0 10px;margin-bottom:10px;min-height:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rua-status-date{margin:0 12px 8px;padding:6px;border:1px solid var(--border);border-radius:4px;text-align:center;font-size:12px;font-family:var(--mono);color:var(--text2)}
@@ -631,7 +632,7 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>ID</th><th>Nome da Rua / Setor</th><th>Responsável</th><th>Líder Responsável</th><th>Turno</th><th>Ativo</th><th>Ações</th></tr>
+                <tr><th>ID</th><th>Nome da Rua / Setor</th><th>Setor</th><th>Responsável</th><th>Líder Responsável</th><th>Turno</th><th>Ativo</th><th>Ações</th></tr>
               </thead>
               <tbody id="tbRuas"></tbody>
             </table>
@@ -821,6 +822,15 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
       <input type="hidden" id="rEditId">
       <div id="mRuaErr" class="msg-err"></div>
       <div class="form-field"><label>Nome da Rua / Setor</label><input type="text" id="rNome" placeholder="Ex: Rua A — Setor Produção"></div>
+      <div class="form-field"><label>Setor</label>
+        <select id="rSetor">
+          <option value="">Selecione</option>
+          <option>Pré-Expedição</option>
+          <option>Matéria-Prima</option>
+          <option>Logística</option>
+          <option>Imprensa</option>
+        </select>
+      </div>
       <div class="form-field"><label>Responsável</label>
         <select id="rRespId"><option value="">Selecione o responsável</option></select>
       </div>
@@ -1133,7 +1143,7 @@ function renderDashboard(){
 
   // Top 5 ruas
   const ruaCount={};
-  allOcorrencias.forEach(r=>{ const n=r.ruas?.nome||r.rua_ocorrencia||'Sem rua'; ruaCount[n]=(ruaCount[n]||0)+1; });
+  allOcorrencias.forEach(r=>{ const n=(r.ruas?.nome||r.rua_ocorrencia||'Sem rua')+(r.ruas?.setor?` — ${r.ruas.setor}`:''); ruaCount[n]=(ruaCount[n]||0)+1; });
   const ruaItems=Object.entries(ruaCount).map(([k,v])=>({k,v})).sort((a,b)=>b.v-a.v).slice(0,5);
 
   barChart('dsChartStatus', statusItems, statusColors);
@@ -1163,7 +1173,7 @@ function renderRuaStatusCards(){
   const naoFinalizados=['Resolvido','Finalizada','Cancelado'];
 
   el.innerHTML=allRuas.map(rua=>{
-    const ocorrRua=allOcorrencias.filter(o=>String(o.rua_id)===String(rua.id) || (!o.rua_id && (o.ruas?.nome===rua.nome || o.rua_ocorrencia===rua.nome)));
+    const ocorrRua=allOcorrencias.filter(o=>String(o.rua_id)===String(rua.id) || (!o.rua_id && o.ruas?.nome===rua.nome && (o.ruas?.setor||null)===(rua.setor||null)) || (!o.rua_id && !o.ruas && o.rua_ocorrencia===rua.nome));
 
     const datas=ocorrRua.map(o=>o.data_ocorrencia).filter(Boolean).sort();
     const ultima=datas.length?datas[datas.length-1]:null;
@@ -1187,7 +1197,7 @@ function renderRuaStatusCards(){
     const avatarHtml=respFoto?`<img src="${respFoto}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:iconAvatar;
 
     return `<div class="rua-status-card">
-      <div class="rua-status-head">${esc(rua.nome)}</div>
+      <div class="rua-status-head">${esc(rua.nome)}${rua.setor?`<div class="rua-status-setor">${esc(rua.setor)}</div>`:''}</div>
       <div class="rua-status-avatar">${avatarHtml}</div>
       <div class="rua-status-name">${esc(respNome)}</div>
       <div class="rua-status-date">${dataFmt}</div>
@@ -1207,7 +1217,7 @@ async function loadRuas(){
   const sel=$('oRua');
   const cur=sel.value;
   sel.innerHTML='<option value="">Selecione a rua</option>';
-  allRuas.forEach(r=>{ const respNome=r.colaboradores?.nome||r.responsavel||''; sel.innerHTML+=`<option value="${r.id}" data-resp="${esc(respNome)}" data-lider="${esc(r.lider_responsavel||'')}" data-turno="${esc(r.turno||'')}">${esc(r.nome)}</option>`; });
+  allRuas.forEach(r=>{ const respNome=r.colaboradores?.nome||r.responsavel||''; const label=r.setor?`${r.nome} — ${r.setor}`:r.nome; sel.innerHTML+=`<option value="${r.id}" data-resp="${esc(respNome)}" data-lider="${esc(r.lider_responsavel||'')}" data-turno="${esc(r.turno||'')}">${esc(label)}</option>`; });
   if(cur) sel.value=cur;
   // tabela
   if(currentPage==='ruas') renderRuas();
@@ -1228,6 +1238,7 @@ function renderRuas(){
     <tr>
       <td class="mono">#${r.id}</td>
       <td><strong>${esc(r.nome)}</strong></td>
+      <td>${r.setor?`<span class="badge b-usuario">${esc(r.setor)}</span>`:'—'}</td>
       <td>${esc(r.colaboradores?.nome||r.responsavel||'—')}</td>
       <td>${esc(r.lider_responsavel||'—')}</td>
       <td>${r.turno?`<span class="badge b-usuario">${esc(r.turno)}</span>`:'—'}</td>
@@ -1251,6 +1262,7 @@ function openRuaModal(r=null){
   $('rEditId').value=r?r.id:'';
   $('mRuaTitle').textContent=r?'Editar Rua / Setor':'Nova Rua / Setor';
   $('rNome').value=r?.nome||'';
+  $('rSetor').value=r?.setor||'';
   populateRRespSelect(r?.responsavel_id||'');
   $('rLider').value=r?.lider_responsavel||'';
   $('rTurno').value=r?.turno||'';
@@ -1263,7 +1275,7 @@ function editRua(id){ const r=allRuas.find(x=>x.id===id); if(r) openRuaModal(r);
 
 async function saveRua(){
   const id=$('rEditId').value;
-  const payload={nome:v('rNome').trim(),responsavel_id:v('rRespId')||null,lider_responsavel:v('rLider').trim()||null,turno:v('rTurno')||null,ativo:$('rAtivo').value==='true'};
+  const payload={nome:v('rNome').trim(),setor:v('rSetor')||null,responsavel_id:v('rRespId')||null,lider_responsavel:v('rLider').trim()||null,turno:v('rTurno')||null,ativo:$('rAtivo').value==='true'};
   if(!payload.nome){ showEl($('mRuaErr'),'Nome é obrigatório.'); return; }
   const btn=$('savRuaBtn'); setBtnLoading(btn,'Salvando...');
   const {error}=id?await sb.from('ruas').update(payload).eq('id',id):await sb.from('ruas').insert(payload);
@@ -1433,7 +1445,7 @@ async function loadOcorrencias(){
   $('loadingOcorrencias').style.display='flex';
   $('emptyOcorrencias').style.display='none';
   $('tbOcorrencias').innerHTML='';
-  const {data,error}=await sb.from('ocorrencias').select('*, ruas(nome,responsavel,turno)').order('id',{ascending:false});
+  const {data,error}=await sb.from('ocorrencias').select('*, ruas(nome,responsavel,turno,setor)').order('id',{ascending:false});
   $('loadingOcorrencias').style.display='none';
   if(error){ toast('Erro ao carregar: '+error.message,'err'); return; }
   allOcorrencias=data||[];
@@ -1453,7 +1465,7 @@ function renderOcorrencias(){
   const q=(v('searchInput')||'').toLowerCase();
   const fs=v('fStatus'), fc=v('fCrit');
   const filtered=allOcorrencias.filter(r=>{
-    const txt=((r.ruas?.nome||r.rua_ocorrencia||'')+r.responsavel+r.lider_responsavel+r.ocorrencia).toLowerCase();
+    const txt=((r.ruas?.nome||r.rua_ocorrencia||'')+(r.ruas?.setor||'')+r.responsavel+r.lider_responsavel+r.ocorrencia).toLowerCase();
     return(!q||txt.includes(q))&&(!fs||r.status===fs)&&(!fc||r.criticidade===fc);
   });
   const tb=$('tbOcorrencias');
@@ -1464,7 +1476,7 @@ function renderOcorrencias(){
   const sc={Aberto:'b-aberto','Em andamento':'b-andamento',Resolvido:'b-resolvido',Cancelado:'b-cancelado',Finalizada:'b-resolvido'};
   const cc={Crítica:'b-critica',Alta:'b-alta',Média:'b-media',Baixa:'b-baixa'};
   tb.innerHTML=filtered.map(r=>{
-    const nomeRua=r.ruas?.nome||r.rua_ocorrencia||'—';
+    const nomeRua=(r.ruas?.nome||r.rua_ocorrencia||'—')+(r.ruas?.setor?` — ${r.ruas.setor}`:'');
     return `<tr>
       <td class="mono">#${r.id}</td>
       <td>${r.data_ocorrencia?new Date(r.data_ocorrencia+'T12:00:00').toLocaleDateString('pt-BR'):'—'}</td>
@@ -1820,7 +1832,8 @@ function exportExcel(){
   const rows=allOcorrencias.map(r=>({
     'ID': r.id,
     'Data Ocorrência': r.data_ocorrencia?new Date(r.data_ocorrencia+'T12:00:00').toLocaleDateString('pt-BR'):'',
-    'Rua / Setor': r.ruas?.nome||r.rua_ocorrencia||'',
+    'Rua': r.ruas?.nome||r.rua_ocorrencia||'',
+    'Setor': r.ruas?.setor||'',
     'Responsável': r.responsavel||'',
     'Líder Responsável': r.lider_responsavel||'',
     'Ocorrência': r.ocorrencia,
