@@ -93,6 +93,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 .page-title{font-family:var(--font-cond);font-size:22px;font-weight:700;letter-spacing:0.3px;color:var(--text)}
 .page-title span{color:var(--text3);font-weight:400}
 
+/* ── RUA STATUS DIÁRIO ── */
+.rua-status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+.rua-status-card{border:2px solid var(--wp-blue);border-radius:var(--radius-lg);overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.rua-status-head{background:var(--wp-blue);color:#fff;text-align:center;padding:9px 8px;font-family:var(--font-cond);font-weight:700;font-size:15px;letter-spacing:.3px}
+.rua-status-avatar{width:60px;height:60px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;margin:14px auto 8px;color:#B0B6C2}
+.rua-status-name{text-align:center;font-size:11px;color:var(--text3);padding:0 10px;margin-bottom:10px;min-height:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rua-status-date{margin:0 12px 8px;padding:6px;border:1px solid var(--border);border-radius:4px;text-align:center;font-size:12px;font-family:var(--mono);color:var(--text2)}
+.rua-status-badge{margin:0 12px 12px;padding:6px 4px;border-radius:4px;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.badge-dia-critico{background:var(--red);color:#fff}
+.badge-dia-ok{background:var(--green);color:#fff}
+.badge-dia-pendente{background:#FDE047;color:#78350F}
+.rua-status-footer{text-align:center;font-size:10.5px;color:var(--text3);padding-bottom:12px;font-style:italic;line-height:1.4}
+
 /* ── STATS ── */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:22px}
 .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;box-shadow:var(--shadow)}
@@ -498,9 +511,14 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
             <div id="dsChartCrit"></div>
           </div>
         </div>
-        <div class="table-card" style="padding:20px">
+        <div class="table-card" style="padding:20px;margin-bottom:20px">
           <div style="font-weight:600;font-size:13px;margin-bottom:14px;color:var(--text)">Top 5 Ruas com mais Ocorrências</div>
           <div id="dsChartRuas"></div>
+        </div>
+
+        <div class="table-card" style="padding:20px">
+          <div style="font-weight:600;font-size:13px;margin-bottom:14px;color:var(--text)">Status Diário por Rua / Setor</div>
+          <div id="dsRuaStatusGrid" class="rua-status-grid"></div>
         </div>
       </div>
 
@@ -1041,6 +1059,58 @@ function renderDashboard(){
   barChart('dsChartStatus', statusItems, statusColors);
   barChart('dsChartCrit', critItems, critColors);
   barChart('dsChartRuas', ruaItems, {});
+
+  renderRuaStatusCards();
+}
+
+/* ── Status diário por rua (cards estilo semáforo) ──
+   Regra de classificação para cada rua:
+   - CRÍTICO (vermelho): existe ocorrência HOJE com criticidade Crítica/Alta,
+     ou existe alguma ocorrência aberta/em andamento marcada como Crítica.
+   - PENDENTE DE CHECK (amarelo): existe ocorrência ainda não finalizada
+     (status diferente de Resolvido/Finalizada/Cancelado) e ainda não
+     verificada em campo (rua_checada = false).
+   - SEM OCORRÊNCIAS (verde): nenhuma ocorrência aberta/pendente para a rua.
+*/
+const iconAvatar=`<svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.34 0-10 1.68-10 5v3h20v-3c0-3.32-6.66-5-10-5z"/></svg>`;
+
+function renderRuaStatusCards(){
+  const el=$('dsRuaStatusGrid'); if(!el) return;
+  if(!allRuas.length){ el.innerHTML='<p style="color:var(--text3);font-size:13px">Nenhuma rua cadastrada.</p>'; return; }
+
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const todayStr=hoje.toISOString().slice(0,10);
+  const naoFinalizados=['Resolvido','Finalizada','Cancelado'];
+
+  el.innerHTML=allRuas.map(rua=>{
+    const ocorrRua=allOcorrencias.filter(o=>String(o.rua_id)===String(rua.id) || (!o.rua_id && (o.ruas?.nome===rua.nome || o.rua_ocorrencia===rua.nome)));
+
+    const datas=ocorrRua.map(o=>o.data_ocorrencia).filter(Boolean).sort();
+    const ultima=datas.length?datas[datas.length-1]:null;
+
+    const ocorrHoje=ocorrRua.filter(o=>o.data_ocorrencia===todayStr);
+    const pendentes=ocorrRua.filter(o=>!naoFinalizados.includes(o.status));
+    const criticaAberta=pendentes.some(o=>o.criticidade==='Crítica'||o.criticidade==='Alta');
+    const naoChecada=pendentes.some(o=>!o.rua_checada);
+
+    let statusLabel, statusClass;
+    if(criticaAberta){ statusLabel='Crítico'; statusClass='badge-dia-critico'; }
+    else if(pendentes.length && naoChecada){ statusLabel='Pendente de Check'; statusClass='badge-dia-pendente'; }
+    else { statusLabel='Sem Ocorrências'; statusClass='badge-dia-ok'; }
+
+    const dataCard=ocorrHoje.length?todayStr:(ultima||todayStr);
+    const dataFmt=new Date(dataCard+'T12:00:00').toLocaleDateString('pt-BR');
+    const ultimaFmt=ultima?new Date(ultima+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+
+    return `<div class="rua-status-card">
+      <div class="rua-status-head">${esc(rua.nome)}</div>
+      <div class="rua-status-avatar">${iconAvatar}</div>
+      <div class="rua-status-name">${esc(rua.responsavel||'Sem responsável definido')}</div>
+      <div class="rua-status-date">${dataFmt}</div>
+      <div class="rua-status-badge ${statusClass}">${statusLabel}</div>
+      <div class="rua-status-footer">Última ocorrência:<br>${ultimaFmt}</div>
+    </div>`;
+  }).join('');
 }
 
 /* ══════════════════════════════════════════════
