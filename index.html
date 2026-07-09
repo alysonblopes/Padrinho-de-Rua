@@ -893,7 +893,7 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
           <select id="cLiderId"><option value="">Selecione o líder</option></select>
         </div>
       </div>
-      <div class="form-field" id="cSetorWrap"><label>Setor que cuida</label>
+      <div class="form-field" id="cSetorWrap"><label>Setor</label>
         <select id="cSetor">
           <option value="">Selecione</option>
           <option>Pré-Expedição</option>
@@ -1392,7 +1392,7 @@ function updateColabCargoFields(){
   const cargo=v('cCargo');
   const isLiderOuCoord=(cargo==='Líder'||cargo==='Coordenador/Supervisor');
   $('cLiderWrap').style.display=isLiderOuCoord?'none':'';
-  $('cSetorWrap').style.display=isLiderOuCoord?'':'none';
+  $('cSetorWrap').style.display='';
 }
 
 function populateCLiderSelect(selectedId,excludeId){
@@ -1448,7 +1448,7 @@ async function saveColaborador(){
     turno:v('cTurno')||null,
     cargo,
     lider_id:isLiderOuCoord?null:(v('cLiderId')||null),
-    setor:isLiderOuCoord?(v('cSetor')||null):null,
+    setor:v('cSetor')||null,
     ativo:$('cAtivo').value==='true'
   };
   const {data,error}=id
