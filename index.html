@@ -718,47 +718,55 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
         <div class="form-field"><label>Rua / Setor</label>
           <select id="oRua" onchange="autoFillResponsavel()"><option value="">Selecione o setor primeiro</option></select>
         </div>
-        <div class="grid2">
-          <div class="form-field"><label>Responsável</label><input type="text" id="oResp" placeholder="Selecione uma rua para preencher automaticamente"></div>
-          <div class="form-field"><label>Líder Responsável</label><input type="text" id="oLider" placeholder="Nome do líder"></div>
+        <div class="form-field" id="oSemOcorrWrap" style="display:none">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500;background:var(--green-lt);padding:12px;border-radius:var(--radius-lg)">
+            <input type="checkbox" id="oSemOcorrencia" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer" onchange="toggleSemOcorrencia()">
+            Rua checada, sem Ocorrências <span style="font-size:11px;font-weight:400;color:var(--text3)">(apenas líderes e admins)</span>
+          </label>
         </div>
-        <div class="form-field"><label>Descrição da Ocorrência</label><textarea id="oDescr" placeholder="Descreva detalhadamente..."></textarea></div>
-        <div id="oStatusField" class="form-field" style="display:none"><label>Status</label>
-          <select id="oStatus"><option>Aberto</option><option>Em andamento</option><option>Resolvido</option><option>Cancelado</option><option>Finalizada</option></select>
-        </div>
-        <div class="grid2">
-          <div class="form-field"><label>Responsável pela Verificação</label><input type="text" id="oRespVerif" placeholder="Nome"></div>
-          <div class="form-field"><label>Registro de Verificação</label><input type="text" id="oRegVerif" placeholder="Ex: REG-2024-001"></div>
-        </div>
-        <!-- VERIFICAÇÃO DE CAMPO -->
-        <div id="oVerifSection" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:4px;background:var(--surface2)">
-          <div style="font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:12px">Verificação de Campo</div>
-          <div class="form-field" style="margin-bottom:12px">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500">
-              <input type="checkbox" id="oRuaChecada" style="width:16px;height:16px;accent-color:var(--wp-blue);cursor:pointer" onchange="handleRuaChecada()">
-              Rua verificada / checada no local
-            </label>
+        <div id="oIncidentFields">
+          <div class="grid2">
+            <div class="form-field"><label>Responsável</label><input type="text" id="oResp" placeholder="Selecione uma rua para preencher automaticamente"></div>
+            <div class="form-field"><label>Líder Responsável</label><input type="text" id="oLider" placeholder="Nome do líder"></div>
           </div>
-          <div class="form-field" id="oAcaoTomadaField">
-            <label>Ação Tomada <span style="font-size:11px;color:var(--text3);font-weight:400">(apenas líderes e admins)</span></label>
-            <textarea id="oAcaoTomada" placeholder="Descreva a ação tomada para resolução..." style="min-height:80px" oninput="handleRuaChecada()"></textarea>
+          <div class="form-field"><label>Descrição da Ocorrência</label><textarea id="oDescr" placeholder="Descreva detalhadamente..."></textarea></div>
+          <div id="oStatusField" class="form-field" style="display:none"><label>Status</label>
+            <select id="oStatus"><option>Aberto</option><option>Em andamento</option><option>Resolvido</option><option>Cancelado</option><option>Finalizada</option></select>
           </div>
-          <div id="oFinalizadaMsg" style="display:none;margin-top:8px;padding:8px 12px;background:var(--green-lt);border-radius:var(--radius);font-size:12px;color:var(--green);font-weight:600">
-            ✓ Ocorrência será marcada como Finalizada
+          <div class="grid2">
+            <div class="form-field"><label>Responsável pela Verificação</label><input type="text" id="oRespVerif" placeholder="Nome"></div>
+            <div class="form-field"><label>Registro de Verificação</label><input type="text" id="oRegVerif" placeholder="Ex: REG-2024-001"></div>
           </div>
-        </div>
+          <!-- VERIFICAÇÃO DE CAMPO -->
+          <div id="oVerifSection" style="border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:4px;background:var(--surface2)">
+            <div style="font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:12px">Verificação de Campo</div>
+            <div class="form-field" style="margin-bottom:12px">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:500">
+                <input type="checkbox" id="oRuaChecada" style="width:16px;height:16px;accent-color:var(--wp-blue);cursor:pointer" onchange="handleRuaChecada()">
+                Rua verificada / checada no local
+              </label>
+            </div>
+            <div class="form-field" id="oAcaoTomadaField">
+              <label>Ação Tomada <span style="font-size:11px;color:var(--text3);font-weight:400">(apenas líderes e admins)</span></label>
+              <textarea id="oAcaoTomada" placeholder="Descreva a ação tomada para resolução..." style="min-height:80px" oninput="handleRuaChecada()"></textarea>
+            </div>
+            <div id="oFinalizadaMsg" style="display:none;margin-top:8px;padding:8px 12px;background:var(--green-lt);border-radius:var(--radius);font-size:12px;color:var(--green);font-weight:600">
+              ✓ Ocorrência será marcada como Finalizada
+            </div>
+          </div>
 
-        <!-- ANEXOS -->
-        <div class="form-field">
-          <label>Anexos</label>
-          <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p>Clique ou arraste arquivos aqui</p>
-            <p style="font-size:11px;color:var(--text3);margin-top:2px">PDF, imagens, documentos — máx. 10MB cada</p>
+          <!-- ANEXOS -->
+          <div class="form-field">
+            <label>Anexos</label>
+            <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p>Clique ou arraste arquivos aqui</p>
+              <p style="font-size:11px;color:var(--text3);margin-top:2px">PDF, imagens, documentos — máx. 10MB cada</p>
+            </div>
+            <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
+            <div class="file-list" id="newFileList"></div>
+            <div class="file-list" id="existingFileList"></div>
           </div>
-          <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
-          <div class="file-list" id="newFileList"></div>
-          <div class="file-list" id="existingFileList"></div>
         </div>
       </div>
     </div>
@@ -967,6 +975,7 @@ let currentProfile = null;
 let allOcorrencias = [];
 let allRuas        = [];
 let allColaboradores = [];
+let allChecagens = [];
 let allUsers       = [];
 
 /* ══════════════════════════════════════════════
@@ -1116,6 +1125,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await loadColaboradores();
       await loadRuas();
       await loadOcorrencias();
+      await loadChecagens();
     } else {
       currentUser=null; currentProfile=null;
       const ls=$('loginScreen'); if(ls) ls.style.display='flex';
@@ -1288,14 +1298,21 @@ function buildRuaCardHtml(rua, todayStr, naoFinalizados){
   const criticaAberta=pendentes.some(o=>o.criticidade==='Crítica'||o.criticidade==='Alta');
   const naoChecada=pendentes.some(o=>!o.rua_checada);
 
+  // Checagens de rotina (rua checada, sem ocorrências)
+  const checagensRua=allChecagens.filter(c=>String(c.rua_id)===String(rua.id));
+  const datasCheck=checagensRua.map(c=>c.data_checagem).filter(Boolean).sort();
+  const ultimaCheck=datasCheck.length?datasCheck[datasCheck.length-1]:null;
+  const checadoHoje=checagensRua.some(c=>c.data_checagem===todayStr);
+
   let statusLabel, statusClass;
   if(criticaAberta){ statusLabel='Crítico'; statusClass='badge-dia-critico'; }
   else if(pendentes.length && naoChecada){ statusLabel='Pendente de Check'; statusClass='badge-dia-pendente'; }
   else { statusLabel='Sem Ocorrências'; statusClass='badge-dia-ok'; }
 
-  const dataCard=ocorrHoje.length?todayStr:(ultima||todayStr);
+  const dataCard=(ocorrHoje.length||checadoHoje)?todayStr:(ultima||todayStr);
   const dataFmt=new Date(dataCard+'T12:00:00').toLocaleDateString('pt-BR');
   const ultimaFmt=ultima?new Date(ultima+'T12:00:00').toLocaleDateString('pt-BR'):'—';
+  const ultimaCheckFmt=ultimaCheck?new Date(ultimaCheck+'T12:00:00').toLocaleDateString('pt-BR'):'—';
 
   const respNome=rua.colaboradores?.nome||rua.responsavel||'Sem responsável definido';
   const respFoto=rua.colaboradores?.foto_url;
@@ -1308,6 +1325,7 @@ function buildRuaCardHtml(rua, todayStr, naoFinalizados){
     <div class="rua-status-date">${dataFmt}</div>
     <div class="rua-status-badge ${statusClass}">${statusLabel}</div>
     <div class="rua-status-footer">Última ocorrência:<br>${ultimaFmt}</div>
+    <div class="rua-status-footer" style="margin-top:2px">Última checagem:<br>${ultimaCheckFmt}</div>
   </div>`;
 }
 
@@ -1592,6 +1610,7 @@ function setOcorrenciaGate(enabled){
     const canStat=currentProfile?.role==='lider'||currentProfile?.role==='admin';
     $('oAcaoTomada').disabled=!canStat;
     $('oRuaChecada').disabled=!canStat;
+    $('oSemOcorrencia').disabled=!canStat;
   }
 }
 
@@ -1600,6 +1619,16 @@ function onSetorChangeOcorrencia(){
   populateOcorrenciaRuaOptions(setor,'');
   setOcorrenciaGate(!!setor);
   autoFillResponsavel();
+}
+
+function toggleSemOcorrencia(){
+  const checked=$('oSemOcorrencia').checked;
+  $('oIncidentFields').style.display=checked?'none':'';
+}
+
+async function loadChecagens(){
+  const {data,error}=await sb.from('checagens_rua').select('*').order('data_checagem',{ascending:false});
+  if(!error) allChecagens=data||[];
 }
 
 /* ══════════════════════════════════════════════
@@ -1722,6 +1751,11 @@ function openOcorrenciaModal(r=null){
   $('oSetor').value=setorAtual;
   populateOcorrenciaRuaOptions(setorAtual, r?.rua_id||'');
   setOcorrenciaGate(!!setorAtual);
+  // Checagem "sem ocorrências" — só disponível para nova ocorrência, líder/admin
+  $('oSemOcorrencia').checked=false;
+  $('oIncidentFields').style.display='';
+  const canStatSemOcorr=currentProfile?.role==='lider'||currentProfile?.role==='admin';
+  $('oSemOcorrWrap').style.display=(!r && canStatSemOcorr)?'':'none';
   // Reset responsavel field state
   const respField=$('oResp');
   respField.readOnly=false; respField.style.background=''; respField.style.color=''; respField.title='';
@@ -1794,8 +1828,29 @@ async function deleteOcorrencia(id){
 async function saveOcorrencia(){
   const id=$('oEditId').value;
   const errEl=$('mOcorrErr'), btn=$('savOcorrBtn');
-  const canStat=currentProfile?.role==='lider'||currentProfile?.role==='admin';
   errEl.style.display='none';
+
+  // Checagem "sem ocorrências" — fluxo separado, não cria ocorrência
+  if(!id && $('oSemOcorrencia') && $('oSemOcorrencia').checked){
+    const ruaId=$('oRua').value;
+    if(!ruaId){ showEl(errEl,'Selecione a rua.'); return; }
+    const dataCheck=v('oData')||new Date().toISOString().slice(0,10);
+    setBtnLoading(btn,'Salvando...');
+    const {error}=await sb.from('checagens_rua').upsert({
+      rua_id:ruaId,
+      data_checagem:dataCheck,
+      checado_por:currentProfile?.nome||null
+    },{onConflict:'rua_id,data_checagem'});
+    resetBtn(btn,'Salvar');
+    if(error){ showEl(errEl,error.message); return; }
+    toast('Checagem registrada — rua sem ocorrências!','ok');
+    closeModal('mOcorrencia');
+    await loadChecagens();
+    if(currentPage==='dashboard') renderDashboard();
+    return;
+  }
+
+  const canStat=currentProfile?.role==='lider'||currentProfile?.role==='admin';
   const ruaChecada=$('oRuaChecada').checked;
   const acaoTomada=canStat?(v('oAcaoTomada')||'').trim():'';
   const finalizada=canStat && ruaChecada && acaoTomada.length>0;
