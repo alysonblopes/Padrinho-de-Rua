@@ -849,7 +849,7 @@ td.truncate{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ell
       <div id="mRuaErr" class="msg-err"></div>
       <div class="form-field"><label>Nome da Rua / Setor</label><input type="text" id="rNome" placeholder="Ex: Rua A — Setor Produção"></div>
       <div class="form-field"><label>Setor</label>
-        <select id="rSetor">
+        <select id="rSetor" onchange="onRuaSetorChange()">
           <option value="">Selecione</option>
           <option>Pré-Expedição</option>
           <option>Matéria-Prima</option>
@@ -1400,11 +1400,18 @@ function renderRuas(){
   `).join('');
 }
 
-function populateRRespSelect(selectedId){
+function populateRRespSelect(selectedId, setor){
   const sel=$('rRespId'); if(!sel) return;
   sel.innerHTML='<option value="">Selecione o responsável</option>';
-  allColaboradores.filter(c=>c.ativo).forEach(c=>{ sel.innerHTML+=`<option value="${c.id}">${esc(c.nome)}</option>`; });
+  allColaboradores
+    .filter(c=>c.ativo && c.cargo==='Colaborador' && (!setor || c.setor===setor))
+    .forEach(c=>{ sel.innerHTML+=`<option value="${c.id}">${esc(c.nome)}</option>`; });
   sel.value=selectedId||'';
+}
+
+function onRuaSetorChange(){
+  populateRRespSelect('', v('rSetor'));
+  autoFillLiderRua();
 }
 
 function autoFillLiderRua(){
@@ -1422,7 +1429,7 @@ function openRuaModal(r=null){
   $('mRuaTitle').textContent=r?'Editar Rua / Setor':'Nova Rua / Setor';
   $('rNome').value=r?.nome||'';
   $('rSetor').value=r?.setor||'';
-  populateRRespSelect(r?.responsavel_id||'');
+  populateRRespSelect(r?.responsavel_id||'', r?.setor||'');
   autoFillLiderRua();
   $('rTurno').value=r?.turno||'';
   $('rAtivo').value=r?String(r.ativo):'true';
@@ -1460,7 +1467,7 @@ async function loadColaboradores(){
   const {data,error}=await sb.from('colaboradores').select('*').order('nome');
   $('loadingColab') && ($('loadingColab').style.display='none');
   if(!error) allColaboradores=data||[];
-  populateRRespSelect($('rRespId')?.value);
+  populateRRespSelect($('rRespId')?.value, v('rSetor'));
   if(currentPage==='responsaveis') renderColaboradores();
 }
 
